@@ -5,8 +5,10 @@
 #include <nlohmann/json.hpp>
 
 int main() {
-    nlohmann::json json;
-    std::cout << curlpp::options::Url(std::string("http://data.itsfactory.fi/journeys/api/1/vehicle-activity"));
+    std::stringstream s;
+    s << curlpp::options::Url(std::string("http://data.itsfactory.fi/journeys/api/1/vehicle-activity"));
+    nlohmann::json json = nlohmann::json::parse(s.str());
+    std::cout << std::setw(4) << json;
     return 1;
 }
 
