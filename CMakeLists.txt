@@ -48,7 +48,12 @@ endif()
 set(CMAKE_OSX_SYSROOT "")
 find_library(CURL curl)
 find_library(CURLPP curlpp)
+
+include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
+conan_basic_setup()
+
 add_executable(opendata-sandbox main.cpp)
 target_compile_features(opendata-sandbox PRIVATE cxx_std_17)
 target_link_libraries(opendata-sandbox PRIVATE project_warnings --coverage)
 target_link_libraries(opendata-sandbox PRIVATE "${CURL}" "${CURLPP}")
+target_link_libraries(opendata-sandbox PRIVATE ${CONAN_LIBS})
