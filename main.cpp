@@ -19,7 +19,7 @@ std::ostream &operator<<(std::ostream &os, const coordinate c)
     return os;
 }
 
-coordinate decode_coord(const json journey)
+coordinate decode_coord_from_journey(const json journey)
 {
     return {std::stod(journey["monitoredVehicleJourney"]["vehicleLocation"]["longitude"].get<std::string>()),
             std::stod(journey["monitoredVehicleJourney"]["vehicleLocation"]["latitude"].get<std::string>())};
@@ -50,27 +50,27 @@ double deg_to_rad(const double deg)
     return deg * pi / 180;
 }
 
-double distanceInKmBetweenEarthCoordinates(double lat1, double lon1, double lat2, double lon2)
+double distanceInKmBetweenEarthCoordinates(const coordinate ca, const coordinate cb)
 {
     const double earthRadiusKm = 6371;
 
-    double dLat = deg_to_rad(lat2 - lat1);
-    double dLon = deg_to_rad(lon2 - lon1);
+    double dLat = deg_to_rad(cb.latitude - ca.latitude);
+    double dLon = deg_to_rad(cb.longitude - ca.longitude);
 
-    lat1 = deg_to_rad(lat1);
-    lat2 = deg_to_rad(lat2);
+    double lat_a = deg_to_rad(ca.latitude);
+    double lat_b= deg_to_rad(cb.latitude);
 
     double a = std::sin(dLat / 2) * std::sin(dLat / 2) +
-               std::sin(dLon / 2) * std::sin(dLon / 2) * std::cos(lat1) * std::cos(lat2);
+               std::sin(dLon / 2) * std::sin(dLon / 2) * std::cos(lat_a) * std::cos(lat_b);
     double c = 2 * std::atan2(std::sqrt(a), std::sqrt(1 - a));
     return earthRadiusKm * c;
 }
 
 int main(int argc, char *argv[])
 {
-    for (const auto journey : journeys_by_line(request("http://data.itsfactory.fi/journeys/api/1/vehicle-activity"), 3))
+    for (const auto journey : journeys_by_line(request("http://data.itsfactory.fi/journeys/api/1/vehicle-activity"), 4))
     {
-        std::cout << decode_coord(journey) << std::endl;
+        std::cout << decode_coord_from_journey(journey) << std::endl;
     }
     std::cout << std::setw(4) << request("https://api.digitransit.fi/geocoding/v1/search?text=" + std::string(argv[1]) + "+" + std::string(argv[2]) + "&size=1");
     return 1;
