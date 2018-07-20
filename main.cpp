@@ -7,6 +7,24 @@
 
 using json = nlohmann::json;
 
+struct coordinate
+{
+    double longitude;
+    double latitude;
+};
+
+std::ostream &operator<<(std::ostream &os, const coordinate c)
+{
+    os << "{ long: " << c.longitude << ", lat:" << c.latitude << "}" << '\n';
+    return os;
+}
+
+coordinate decode_coord(const json journey)
+{
+    return {std::stod(journey["monitoredVehicleJourney"]["vehicleLocation"]["longitude"].get<std::string>()),
+            std::stod(journey["monitoredVehicleJourney"]["vehicleLocation"]["latitude"].get<std::string>())};
+}
+
 json journeys_by_line(const json &j, int line)
 {
     json rv;
@@ -50,7 +68,10 @@ double distanceInKmBetweenEarthCoordinates(double lat1, double lon1, double lat2
 
 int main(int argc, char *argv[])
 {
-    std::cout << std::setw(4) << journeys_by_line(request("http://data.itsfactory.fi/journeys/api/1/vehicle-activity"), 3);
+    for (const auto journey : journeys_by_line(request("http://data.itsfactory.fi/journeys/api/1/vehicle-activity"), 3))
+    {
+        std::cout << decode_coord(journey) << std::endl;
+    }
     std::cout << std::setw(4) << request("https://api.digitransit.fi/geocoding/v1/search?text=" + std::string(argv[1]) + "+" + std::string(argv[2]) + "&size=1");
     return 1;
 }
