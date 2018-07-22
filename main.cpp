@@ -25,6 +25,13 @@ coordinate decode_coord_from_journey(const json journey)
             std::stod(journey["monitoredVehicleJourney"]["vehicleLocation"]["latitude"].get<std::string>())};
 }
 
+coordinate decode_coord_from_digitransit_geoc(const json geoc)
+{
+    coordinate rv;
+    std::tie(rv.longitude, rv.latitude) = geoc.at("features").at(0).at("geometry").at("coordinates").get<std::tuple<double, double>>();
+    return rv;
+}
+
 json journeys_by_line(const json &j, int line)
 {
     json rv;
@@ -58,7 +65,7 @@ double distanceInKmBetweenEarthCoordinates(const coordinate ca, const coordinate
     double dLon = deg_to_rad(cb.longitude - ca.longitude);
 
     double lat_a = deg_to_rad(ca.latitude);
-    double lat_b= deg_to_rad(cb.latitude);
+    double lat_b = deg_to_rad(cb.latitude);
 
     double a = std::sin(dLat / 2) * std::sin(dLat / 2) +
                std::sin(dLon / 2) * std::sin(dLon / 2) * std::cos(lat_a) * std::cos(lat_b);
@@ -68,10 +75,11 @@ double distanceInKmBetweenEarthCoordinates(const coordinate ca, const coordinate
 
 int main(int argc, char *argv[])
 {
-    for (const auto journey : journeys_by_line(request("http://data.itsfactory.fi/journeys/api/1/vehicle-activity"), 4))
+    std::cout << std::setw(4) << decode_coord_from_digitransit_geoc(request("https://api.digitransit.fi/geocoding/v1/search?text=" + std::string(argv[1]) + "+" + std::string(argv[2]) + "&size=1"));
+
+    for (const auto journey : journeys_by_line(request("http://data.itsfactory.fi/journeys/api/1/vehicle-activity"), 3))
     {
         std::cout << decode_coord_from_journey(journey) << std::endl;
     }
-    std::cout << std::setw(4) << request("https://api.digitransit.fi/geocoding/v1/search?text=" + std::string(argv[1]) + "+" + std::string(argv[2]) + "&size=1");
     return 1;
 }
