@@ -62,15 +62,15 @@ double distance_in_km(const coordinate ca, const coordinate cb)
 {
     const double earth_radius_km = 6371;
 
-    double dLat = deg_to_rad(cb.latitude - ca.latitude);
-    double dLon = deg_to_rad(cb.longitude - ca.longitude);
+    const double dLat = deg_to_rad(cb.latitude - ca.latitude);
+    const double dLon = deg_to_rad(cb.longitude - ca.longitude);
 
-    double lat_a = deg_to_rad(ca.latitude);
-    double lat_b = deg_to_rad(cb.latitude);
+    const double lat_a = deg_to_rad(ca.latitude);
+    const double lat_b = deg_to_rad(cb.latitude);
 
-    double a = std::sin(dLat / 2) * std::sin(dLat / 2) +
+    const double a = std::sin(dLat / 2) * std::sin(dLat / 2) +
                std::sin(dLon / 2) * std::sin(dLon / 2) * std::cos(lat_a) * std::cos(lat_b);
-    double c = 2 * std::atan2(std::sqrt(a), std::sqrt(1 - a));
+    const double c = 2 * std::atan2(std::sqrt(a), std::sqrt(1 - a));
     return earth_radius_km * c;
 }
 
