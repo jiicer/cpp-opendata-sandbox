@@ -57,9 +57,10 @@ double deg_to_rad(const double deg)
     return deg * pi / 180;
 }
 
-double distanceInKmBetweenEarthCoordinates(const coordinate ca, const coordinate cb)
+// https://stackoverflow.com/questions/365826/calculate-distance-between-2-gps-coordinates
+double distance_in_km(const coordinate ca, const coordinate cb)
 {
-    const double earthRadiusKm = 6371;
+    const double earth_radius_km = 6371;
 
     double dLat = deg_to_rad(cb.latitude - ca.latitude);
     double dLon = deg_to_rad(cb.longitude - ca.longitude);
@@ -70,16 +71,16 @@ double distanceInKmBetweenEarthCoordinates(const coordinate ca, const coordinate
     double a = std::sin(dLat / 2) * std::sin(dLat / 2) +
                std::sin(dLon / 2) * std::sin(dLon / 2) * std::cos(lat_a) * std::cos(lat_b);
     double c = 2 * std::atan2(std::sqrt(a), std::sqrt(1 - a));
-    return earthRadiusKm * c;
+    return earth_radius_km * c;
 }
 
 int main(int argc, char *argv[])
 {
-    std::cout << std::setw(4) << decode_coord_from_digitransit_geoc(request("https://api.digitransit.fi/geocoding/v1/search?text=" + std::string(argv[1]) + "+" + std::string(argv[2]) + "&size=1"));
-
+    coordinate ref = decode_coord_from_digitransit_geoc(request("https://api.digitransit.fi/geocoding/v1/search?text=" + std::string(argv[1]) + "+" + std::string(argv[2]) + "&size=1"));
+   
     for (const auto journey : journeys_by_line(request("http://data.itsfactory.fi/journeys/api/1/vehicle-activity"), 3))
     {
-        std::cout << decode_coord_from_journey(journey) << std::endl;
+        std::cout << distance_in_km(ref, decode_coord_from_journey(journey)) << std::endl;
     }
     return 1;
 }
