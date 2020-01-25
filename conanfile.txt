@@ -1,5 +1,5 @@
 [requires]
-jsonformoderncpp/3.1.2@vthiery/stable
+jsonformoderncpp/3.7.3@vthiery/stable
 catch2/2.2.2@bincrafters/stable
 
 [generators]
